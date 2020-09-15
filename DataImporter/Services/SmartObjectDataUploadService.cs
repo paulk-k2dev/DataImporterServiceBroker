@@ -131,10 +131,10 @@ namespace DataImporter.Services
                     if (isTransaction) Message += $"Transaction '{transactionIdName}' added with value '{transactionIdValue}'. ";
                 }
             }
-            catch (ApplicationException ex)
+            catch (ApplicationException aEx)
             {
                 Status = UploadStatus.Error;
-                Message = "Unable to insert data into SmartObject: " + ex.Message;
+                Message = "Unable to insert data into SmartObject: " + aEx.Message;
             }
             catch (FormatException fEx)
             {
@@ -156,12 +156,12 @@ namespace DataImporter.Services
                 Status = UploadStatus.Error;
                 Message = ioEx.Message;
             }
-            catch (SmartObjectException ex)
+            catch (SmartObjectException smoEx)
             {
                 Status = UploadStatus.Error;
                 if (!_settings.IsBulkImport)
                 {
-                    foreach (SmartObjectExceptionData smOExBrokerData in ex.BrokerData)
+                    foreach (SmartObjectExceptionData smOExBrokerData in smoEx.BrokerData)
                     {
                         if (smOExBrokerData.Message.Equals("Unable to create the object. An object with the specified key property(s) already exist."))
                         {
@@ -171,7 +171,7 @@ namespace DataImporter.Services
                 }
                 else
                 {
-                    foreach (SmartObjectExceptionData smOExBrokerData in ex.BrokerData)
+                    foreach (SmartObjectExceptionData smOExBrokerData in smoEx.BrokerData)
                     {
                         Message += smOExBrokerData.Message;
                     }

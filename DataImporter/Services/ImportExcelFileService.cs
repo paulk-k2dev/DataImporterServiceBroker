@@ -102,7 +102,7 @@ namespace DataImporter.Services
                                 cellValue = column.Positions.Aggregate(cellValue,
                                     (current, position) =>
                                         current +
-                                        $"{spreadsheet.GetCellValue(row, position)}{_settings.DuplicateDelimiter}");
+                                        $"{spreadsheet.GetCellValue(row, position)}{delimiter}");
 
                                 // If the value is just made up of the delimiters then blank the value.
                                 if (cellValue.All(d => d == delimiter)) cellValue = string.Empty;
