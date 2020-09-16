@@ -7,7 +7,7 @@ It uses the OpenXML SDK for Office when doing the Excel importing and utilises t
 
 The [GenericParser](https://github.com/AndrewRissing/GenericParsing) component was used for CSV importing.
 
-This was tested on K2 blackpearl 4.7 and the solution was built using Visual Studio 2015.
+This was tested on K2 versions 4.7 and 5.4. The solution was built using Visual Studio 2015.
 
 Note that this service broker was created as a proof of concept and is provided as-is.  It has been tested to verify functionality but has not gone through a full QA cycle or tested under heavy load.
 
