@@ -73,7 +73,9 @@ namespace DataImporter.Services
                     // Get the rows, skipping the specified number of rows to find the header and data
                     // in case of other information included in the sheet that isn't the actual data we care about
                     var rows = sheetData.Descendants<Row>().Skip(_settings.HeaderRowIndex).ToList();
-                    if (!rows.Any()) return;
+
+                    if (!rows.Any())
+                        throw new InvalidOperationException("No rows found.");
 
                     // Get the column headers from the header row, add them to the data table
                     var columnDefinitions = BuildHeaders(spreadsheet, rows.First());
@@ -138,6 +140,11 @@ namespace DataImporter.Services
                         $"'{string.Join("', '", _data.Columns.Cast<DataColumn>().Select(c => c.ColumnName))}'. " +
                         $"{_data.Rows.Count} rows parsed for import. ";
                 }
+            }
+            catch (InvalidOperationException iOex)
+            {
+                Status = ImportStatus.NoRowsFound;
+                Message = iOex.Message;
             }
             catch (FileFormatException)
             {
