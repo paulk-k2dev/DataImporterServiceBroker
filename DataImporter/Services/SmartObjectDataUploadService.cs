@@ -108,6 +108,9 @@ namespace DataImporter.Services
                         else
                         {
                             var uploaded = 0;
+
+                            Status = UploadStatus.Complete;
+
                             foreach (SmartObject smo in inputList.SmartObjectsList)
                             {
                                 try
@@ -116,12 +119,11 @@ namespace DataImporter.Services
                                     uploaded++;
                                 }
                                 catch
-                                { 
-                                    // Ignored
-                                } 
+                                {
+                                    Status = UploadStatus.Partial;
+                                }
                             }
 
-                            Status = UploadStatus.Partial;
                             Message +=
                                 $"Uploaded {uploaded} of {_settings.Data.Rows.Count} rows with {matches.Count} matching columns to {_settings.SmartObjectName}. ";
                         }
