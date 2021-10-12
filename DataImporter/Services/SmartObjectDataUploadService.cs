@@ -108,12 +108,15 @@ namespace DataImporter.Services
                         else
                         {
                             var uploaded = 0;
+                            var currentRow = 0;
+                            var failedRows = "";
 
                             Status = UploadStatus.Complete;
 
                             foreach (SmartObject smo in inputList.SmartObjectsList)
                             {
-                                try
+                                currentRow++;
+                                try 
                                 {
                                     conn.ExecuteScalar(smo);
                                     uploaded++;
@@ -121,11 +124,17 @@ namespace DataImporter.Services
                                 catch
                                 {
                                     Status = UploadStatus.Partial;
+                                    failedRows += $"{currentRow}, ";
                                 }
                             }
 
                             Message +=
-                                $"Uploaded {uploaded} of {_settings.Data.Rows.Count} rows with {matches.Count} matching columns to {_settings.SmartObjectName}. ";
+                                $"Uploaded {uploaded} of {_settings.Data.Rows.Count} rows with {matches.Count} matching columns to '{_settings.SmartObjectName}'. ";
+
+                            if (failedRows.Length > 0)
+                            {
+                                Message += $"The following rows failed to upload: {failedRows.Remove(failedRows.Length - 2)}. " ;
+                            }
                         }
                     }
 
