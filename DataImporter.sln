@@ -8,9 +8,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataImporterTester", "DataImporterTester\DataImporterTester.csproj", "{1E97CE05-E831-4FBE-99A4-A8D850912BDA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{624802A8-E8F3-4489-9278-9106057171EC}"
-	ProjectSection(SolutionItems) = preProject
-		Data Service Broker v1.0.04.docx = Data Service Broker v1.0.04.docx
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,17 +26,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://glowrad.visualstudio.com/
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = DataImporter\\DataImporter.csproj
-		SccProjectName1 = DataImporter
-		SccLocalPath1 = DataImporter
-		SccProjectUniqueName2 = DataImporterTester\\DataImporterTester.csproj
-		SccProjectName2 = DataImporterTester
-		SccLocalPath2 = DataImporterTester
 	EndGlobalSection
 EndGlobal

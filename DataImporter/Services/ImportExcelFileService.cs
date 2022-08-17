@@ -17,7 +17,7 @@ namespace DataImporter.Services
         private readonly ExcelImportSettings _settings;
 
         public ImportStatus Status { get; private set; } = ImportStatus.Pending;
-        
+
         public string Message { get; private set; } = "";
 
         private DataTable _data;
@@ -41,7 +41,7 @@ namespace DataImporter.Services
                 throw new ArgumentOutOfRangeException(nameof(_settings.HeaderRowSpaces), _settings.HeaderRowSpaces,
                     "Header Row Spaces value must be either 'Replace' or 'Remove'");
 
-            if(_settings.DuplicateDelimiter.ToCharArray().Length > 1)
+            if (_settings.DuplicateDelimiter.ToCharArray().Length > 1)
                 throw new ArgumentOutOfRangeException(nameof(_settings.DuplicateDelimiter), _settings.DuplicateDelimiter,
                     "Duplicate Column Delimiter is invalid.");
         }
@@ -57,7 +57,6 @@ namespace DataImporter.Services
             {
                 _data = new DataTable();
 
-                var delimiter = _settings.DuplicateDelimiter.ToCharArray()[0];
                 var bytes = FromK2File(_settings.File);
                 var stream = new MemoryStream(bytes);
 
@@ -86,34 +85,30 @@ namespace DataImporter.Services
                         var columnIndex = 0;
                         var newRow = _data.NewRow();
                         var isEmptyRow = true;
-                        
+
                         // Loop through the column definitions and pull out the ordinal position value
                         foreach (var column in columnDefinitions)
                         {
+                            var delimiter = (column.CellReferences.Count() > 1)
+                                ? _settings.DuplicateDelimiter.First().ToString()
+                                : "";
+
                             var cellValue = "";
 
-                            // Not a duplicate column so get the value
-                            if (column.Positions.Count == 1)
+                            foreach (var reference in column.CellReferences)
                             {
-                                cellValue = spreadsheet.GetCellValue(row, column.Positions.First());
+                                var cell = row.Descendants<Cell>().FirstOrDefault(c => c.CellReference == $"{reference}{row.RowIndex}");
+
+                                if (cell == null) continue;
+
+                                cellValue += spreadsheet.GetCellValue(cell) + delimiter;
+
+                                if (!string.IsNullOrWhiteSpace(cellValue)) isEmptyRow = false;
+
+                                if (cellValue.All(c => c  == _settings.DuplicateDelimiter.First())) cellValue = string.Empty;
+
+                                newRow[columnIndex] = cellValue;
                             }
-                            else
-                            {
-                                // Duplicate column name, append the value from the additional
-                                // positions to the first column with the specified delimiter
-                                cellValue = column.Positions.Aggregate(cellValue,
-                                    (current, position) =>
-                                        current +
-                                        $"{spreadsheet.GetCellValue(row, position)}{delimiter}");
-
-                                // If the value is just made up of the delimiters then blank the value.
-                                if (cellValue.All(d => d == delimiter)) cellValue = string.Empty;
-                            }
-
-                            if (!string.IsNullOrWhiteSpace(cellValue)) isEmptyRow = false;
-
-                            // Add the value to the ordinal position 
-                            newRow[columnIndex] = cellValue;
 
                             columnIndex++;
                         }
@@ -168,15 +163,15 @@ namespace DataImporter.Services
         {
             var columns = new List<ColumnDefinition>();
 
-            var position = 0;
-
-            foreach (var unused in headerRow.Descendants<Cell>())
+            foreach (var cell in headerRow.Descendants<Cell>())
             {
-                var columnName = spreadsheetDocument.GetCellValue(headerRow, position)
+                var columnName = spreadsheetDocument.GetCellValue(cell)
                     .FormatColumnName(_settings.HeaderRowSpaces);
 
                 // Find the column definition by name, if it exists
                 var existingColumn = columns.FirstOrDefault(n => n.Name == columnName);
+
+                var cellReference = cell.CellReference.Value.TrimEnd('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
 
                 // Column not found, add to the collection
                 if (existingColumn == null)
@@ -184,7 +179,7 @@ namespace DataImporter.Services
                     columns.Add(new ColumnDefinition
                     {
                         Name = columnName,
-                        Positions = new List<int>() {position}
+                        CellReferences = new List<string>() { cellReference }
                     });
 
                     // Add the de-duplicated columns to the DataTable
@@ -194,10 +189,8 @@ namespace DataImporter.Services
                 {
                     // Add the current ordinal position to the
                     // matching column already added
-                    existingColumn.Positions.Add(position);
+                    existingColumn.CellReferences.Add(cellReference);
                 }
-
-                position++;
             }
 
             return columns;

@@ -5,11 +5,12 @@ namespace DataImporter.Entities
     internal class ColumnDefinition
     {
         public string Name { get; set; }
-        public List<int> Positions { get; set; }
+
+        public List<string> CellReferences { get; set; }
 
         public ColumnDefinition()
         {
-            Positions = new List<int>();
+            CellReferences = new List<string>();
         }
     }
 }

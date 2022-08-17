@@ -19,30 +19,28 @@ namespace DataImporter.Extensions
             var sheetId = spreadsheet.FirstOrNamedSheetId(name);
 
             var workbookPart = spreadsheet.WorkbookPart;
-            var worksheetPart = (WorksheetPart) workbookPart.GetPartById(sheetId);
-            
+            var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheetId);
+
             return worksheetPart;
         }
 
         /// <summary>
         /// Get the value in a Cell
         /// </summary>
-        /// <param name="spreadsheetDocument">The spreadsheet</param>
-        /// <param name="row">The row containing the cell to get the value from</param>
-        /// <param name="position">The position of the cell in the row</param>
+        /// <param name="spreadsheet">The spreadsheet</param>
+        /// <param name="cell">The cell to get the value from</param>
         /// <returns>The value in cell</returns>
-        public static string GetCellValue(this SpreadsheetDocument spreadsheetDocument, Row row, int position)
+        public static string GetCellValue(this SpreadsheetDocument spreadsheet, Cell cell)
         {
-            var cell = row.Descendants<Cell>().ElementAtOrDefault(position);
-            if (cell?.CellValue == null) return string.Empty;
+            var stringTablePart = spreadsheet.WorkbookPart.SharedStringTablePart;
+            var value = cell.CellValue.InnerXml;
 
-            var cellValue = cell.CellValue.InnerText.Trim();
+            if (cell.DataType != null && cell.DataType.Value == CellValues.SharedString)
+            {
+                return stringTablePart.SharedStringTable.ChildElements[int.Parse(value)].InnerText.Trim();
+            }
 
-            if (cell.DataType?.Value != CellValues.SharedString) return cellValue;
-
-            var sharedString = spreadsheetDocument.WorkbookPart.SharedStringTablePart;
-
-            return sharedString.SharedStringTable.ChildElements[int.Parse(cellValue)].InnerText.Trim();
+            return value ?? "";
         }
 
         /// <summary>
