@@ -103,9 +103,9 @@ namespace DataImporter.Services
 
                                 cellValue += spreadsheet.GetCellValue(cell) + delimiter;
 
-                                if (!string.IsNullOrWhiteSpace(cellValue)) isEmptyRow = false;
-
                                 if (cellValue.All(c => c  == _settings.DuplicateDelimiter.First())) cellValue = string.Empty;
+
+                                if (!string.IsNullOrWhiteSpace(cellValue)) isEmptyRow = false;
 
                                 newRow[columnIndex] = cellValue;
                             }
