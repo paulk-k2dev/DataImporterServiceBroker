@@ -32,15 +32,15 @@ namespace DataImporter.Extensions
         /// <returns>The value in cell</returns>
         public static string GetCellValue(this SpreadsheetDocument spreadsheet, Cell cell)
         {
-            var stringTablePart = spreadsheet.WorkbookPart.SharedStringTablePart;
-            var value = cell.CellValue.InnerXml;
+            if (cell?.CellValue == null) return string.Empty;
 
-            if (cell.DataType != null && cell.DataType.Value == CellValues.SharedString)
-            {
-                return stringTablePart.SharedStringTable.ChildElements[int.Parse(value)].InnerText.Trim();
-            }
+            var cellValue = cell.CellValue.InnerText.Trim();
 
-            return value ?? "";
+            if (cell.DataType?.Value != CellValues.SharedString) return cellValue;
+
+            var sharedString = spreadsheet.WorkbookPart.SharedStringTablePart;
+
+            return sharedString.SharedStringTable.ChildElements[int.Parse(cellValue)].InnerText.Trim();
         }
 
         /// <summary>
