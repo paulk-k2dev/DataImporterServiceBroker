@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using SourceCode.SmartObjects.Client;
 
 namespace DataImporter.Extensions
@@ -8,7 +9,7 @@ namespace DataImporter.Extensions
         private const string DateFormat = "yyyy-MM-dd";
         private const string TimeFormat = "HH:mm:ss";
 
-        public static string GetValue(this SmartProperty property, object value)
+        public static string GetFormattedValue(this SmartProperty property, object value)
         {
             var stringValue = value.ToString();
 
@@ -42,6 +43,19 @@ namespace DataImporter.Extensions
                         var dateTime = DateTime.FromOADate(Convert.ToDouble(value.ToString()));
                         return dateTime.ToString($"{DateFormat} {TimeFormat}");
                     }
+                case PropertyType.Decimal:
+                    // try to remove scientific notation from decimal values as it causes problems on import
+                    try
+                    {
+                        var decimalValue = decimal.Parse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture);
+                        return decimalValue.ToString(CultureInfo.InvariantCulture);
+                    }
+
+                    // failed return the value as we got it
+                    catch
+                    {
+                        return stringValue;
+                    }
                 case PropertyType.Time:
                     // try default date conversion
                     try
@@ -56,7 +70,7 @@ namespace DataImporter.Extensions
                         return time.ToString(TimeFormat);
                     }
                 default:
-                    return value.ToString();
+                    return stringValue;
             }
         }
     }

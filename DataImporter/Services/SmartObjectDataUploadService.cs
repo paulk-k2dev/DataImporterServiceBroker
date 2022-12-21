@@ -84,7 +84,7 @@ namespace DataImporter.Services
                             foreach (var column in matches)
                             {
                                 var smoColumn = newSmartObject.Properties[column];
-                                smoColumn.Value = smoColumn.GetValue(dr[column]);
+                                smoColumn.Value = smoColumn.GetFormattedValue(dr[column]);
                             }
 
                             // Add the transaction Id value for identification purposes.
